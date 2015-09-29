@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <random>
 #include <vector>
@@ -13,35 +13,43 @@
 
 std::mt19937 create_rand_engine(){
 	std::random_device rnd;
-	std::vector<std::uint_least32_t> v(10);// ‰Šú‰»—pƒxƒNƒ^
-	std::generate(v.begin(), v.end(), std::ref(rnd));// ƒxƒNƒ^‚Ì‰Šú‰»
+	std::vector<std::uint_least32_t> v(10);// åˆæœŸåŒ–ç”¨ãƒ™ã‚¯ã‚¿
+	std::generate(v.begin(), v.end(), std::ref(rnd));// ãƒ™ã‚¯ã‚¿ã®åˆæœŸåŒ–
 	std::seed_seq seed(v.begin(), v.end());
-	return std::mt19937(seed);// —”ƒGƒ“ƒWƒ“
+	return std::mt19937(seed);// ä¹±æ•°ã‚¨ãƒ³ã‚¸ãƒ³
 }
-
+namespace detail {
+	template<typename T> auto diff(T n1, T n2) -> typename std::make_unsigned<T>::type {
+		static_assert(std::is_integral<T>::value, "T is not integral.");
+		if (n1 < n2) std::swap(n1, n2);
+		return static_cast<typename std::make_unsigned<T>::type>(n1 - n2);
+	}
+}
 std::vector<int> make_rand_array_hash(const size_t size, int rand_min, int rand_max){
+	using type = decltype(rand_min);
 	if(rand_min > rand_max) std::swap(rand_min, rand_max);
-	const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
-	if(max_min_diff < size) throw std::runtime_error("ˆø”‚ªˆÙí‚Å‚·");
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
 
-	std::unordered_set<int> tmp;
+	std::unordered_set<type> tmp;
 	auto engine = create_rand_engine();
-	std::uniform_int_distribution<int> distribution(rand_min, rand_max);
+	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
 	while(tmp.size() < size) tmp.insert(distribution(engine));
-	return std::vector<int>(tmp.begin(), tmp.end());
+	return std::vector<type>(tmp.begin(), tmp.end());
 }
 
 std::vector<int> make_rand_array_unique(const size_t size, int rand_min, int rand_max){
+	using type = decltype(rand_min);
 	if(rand_min > rand_max) std::swap(rand_min, rand_max);
-	const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
-	if(max_min_diff < size) throw std::runtime_error("ˆø”‚ªˆÙí‚Å‚·");
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
 
-	std::vector<int> tmp;
+	std::vector<type> tmp;
 	auto engine = create_rand_engine();
-	std::uniform_int_distribution<int> distribution(rand_min, rand_max);
+	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
 
-	const size_t make_size = static_cast<size_t>(size*1.2);
-
+	const size_t make_size = (static_cast<uintmax_t>(std::numeric_limits<double>::max()) < size) ? ((std::numeric_limits<size_t>::max() - size / 5) < size) ? size : size + size / 5 : static_cast<size_t>(size*1.2);
+	tmp.reserve(make_size);
 	while(tmp.size() < size){
 		while(tmp.size() < make_size) tmp.push_back(distribution(engine));
 		std::sort(tmp.begin(), tmp.end());
@@ -54,63 +62,74 @@ std::vector<int> make_rand_array_unique(const size_t size, int rand_min, int ran
 	}
 
 	std::shuffle(tmp.begin(), tmp.end(), engine);
-	return std::move(tmp);
+	return tmp;
 }
 
 std::vector<int> make_rand_array_shuffle(const size_t size, int rand_min, int rand_max){
 	if(rand_min > rand_max) std::swap(rand_min, rand_max);
-	const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
-	if(max_min_diff < size) throw std::runtime_error("ˆø”‚ªˆÙí‚Å‚·");
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
 
-	std::vector<int> tmp;
+	std::vector<decltype(rand_min)> tmp;
 	tmp.reserve(max_min_diff);
 
-	for(int i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+	for(auto i = rand_min; i <= rand_max; ++i) tmp.push_back(i);
 
 	auto engine = create_rand_engine();
 	std::shuffle(tmp.begin(), tmp.end(), engine);
 
 	tmp.erase(std::next(tmp.begin(), size), tmp.end());
 
-	return std::move(tmp);
+	return tmp;
 }
-namespace detail {
-	template<typename Re>class affluence_inc_gen_c {
-	public:
-		affluence_inc_gen_c(uintmax_t affluence) : affluence_(affluence) {}
-		Re operator()(std::mt19937& engin) {
-			const auto re = std::uniform_int_distribution<Re>(0, this->make_rand_max())(engin);
-			this->affluence_ -= re;
-			return re;
-		}
-	private:
-		Re make_rand_max() { return (this->affluence_ < std::numeric_limits<Re>::max()) ? static_cast<Re>(this->affluence_) : std::numeric_limits<Re>::max(); }
-		uintmax_t affluence_;
-	};
-	template<typename T> auto diff(T n1, T n2) -> typename std::make_unsigned<T>::type {
-		static_assert(std::is_integral<T>::value, "T is not integral.");
-		if (n1 < n2) std::swap(n1, n2);
-		return static_cast<typename std::make_unsigned<T>::type>(n1 - n2);
-	}
-}
-std::vector<int> make_rand_array_liner_gen_shuffle(const size_t size, int rand_min, int rand_max) {
+std::vector<int> make_rand_array_select(const size_t size, int rand_min, int rand_max) {
 	using type = decltype(rand_min);
 	if (rand_min > rand_max) std::swap(rand_min, rand_max);
 	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-	if (max_min_diff < size) throw std::runtime_error("ˆø”‚ªˆÙí‚Å‚·");
-	const auto affluence = max_min_diff - size;
+	if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+	std::vector<type> tmp;
+	tmp.reserve(max_min_diff);
+
+	for (auto i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+
 	auto engine = create_rand_engine();
-	if (0 == affluence) return [size, rand_min, &engine]() {
-		std::vector<type> re(size);
-		int t = rand_min;
-		for (auto& i : re) i = t++;
-		std::shuffle(re.begin(), re.end(), engine);
-		return re;
-	}();
-	std::vector<type> re;
-	re.reserve(size);
-	detail::affluence_inc_gen_c<type> affluence_inc(affluence);
-	for (auto i = affluence_inc(engine) + rand_min; re.size() < size; i += affluence_inc(engine) + 1) re.push_back(i);
+	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
+
+	for (size_t cnt = 0; cnt < size; ++cnt) {
+		size_t pos = std::uniform_int_distribution<size_t>(cnt, tmp.size() - 1)(engine);
+
+		if (cnt != pos) std::swap(tmp[cnt], tmp[pos]);
+	}
+	tmp.erase(std::next(tmp.begin(), size), tmp.end());
+
+	return tmp;
+}
+
+std::vector<int> make_rand_array_just_shuffle(const size_t size, int rand_min, int rand_max) {
+	using type = decltype(rand_min);
+	if (rand_min > rand_max) std::swap(rand_min, rand_max);
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if (max_min_diff != size) throw std::runtime_error("Invalid argument");
+
+	auto engine = create_rand_engine();
+	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
+	std::vector<type> re(size);
+	auto t = rand_min;
+	std::generate(re.begin(), re.end(), [&t]() { return t++; });
 	std::shuffle(re.begin(), re.end(), engine);
-	return std::move(re);
+	return re;
+}
+std::vector<int> make_rand_array(const size_t size, int rand_min, int rand_max) {
+	if (rand_min > rand_max) std::swap(rand_min, rand_max);
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+	
+	if (max_min_diff == size) return make_rand_array_just_shuffle(size, rand_min, rand_max);
+	else if (static_cast<uintmax_t>(std::numeric_limits<double>::max()) < max_min_diff || size < (max_min_diff * 0.04)) {
+		return make_rand_array_unique(size, rand_min, rand_max);
+	}
+	else {
+		return make_rand_array_select(size, rand_min, rand_max);
+	}
 }
