@@ -2,6 +2,8 @@
 #include<vector>
 #include<array>
 #include<utility>
+#include<fstream>
+#include<string>
 #include"randseq.hpp"
 
 template<class T>
@@ -20,25 +22,34 @@ int main(){
 
 	std::vector<std::pair<std::string, std::function<void(size_t, int, int)>>> FuncArray;
 
-	FuncArray.push_back(std::make_pair("make_rand_array_hash", make_rand_array_hash));
-	FuncArray.push_back(std::make_pair("make_rand_array_unique", make_rand_array_unique));
-//	FuncArray.push_back(std::make_pair("make_rand_array_shuffle", make_rand_array_shuffle));
+	FuncArray.push_back(std::make_pair("make_rand_array_just_shuffle", make_rand_array_just_shuffle));
+	FuncArray.push_back(std::make_pair("make_rand_array_shuffle", make_rand_array_shuffle));
+	FuncArray.push_back(std::make_pair("make_rand_array_select", make_rand_array_select));
 
 	try{
-		for(auto val : {10,100,1000,10000}){
-			array_num = 10000;
-			rand_max = val*array_num;
-			rand_min = -val*array_num;
+		std::ofstream fout("randseq3.csv");
 
-			std::cout << "array_num : " << array_num << "rand_max : " << rand_max << "rand_min : " << rand_min << std::endl;
-			for(auto func : FuncArray){
-				const auto t0 = clock::now();
+		fout << "array_num, rand_max, rand_min, type, time\n";
+		for(size_t array_num_ : {10000}){
+			for(int val : {5000,5001,5002,5004,5008,5016}){
+				array_num = array_num_;
+				rand_max = val;
+				rand_min = -val;
 
-				for(unsigned int cnt = 0; cnt < 100;++cnt){
-					func.second(array_num, rand_min, rand_max);
+				std::cout << "array_num : " << array_num << "rand_max : " << rand_max << "rand_min : " << rand_min << std::endl;
+				for(auto func : FuncArray){
+					const auto t0 = clock::now();
+
+					for(unsigned int cnt = 0; cnt < 10000000 / array_num; ++cnt){
+						func.second(array_num, rand_min, rand_max);
+					}
+
+					auto t1 = clock::now();
+
+					print_elapsed_time(func.first.c_str(), t0, t1);
+
+					fout << array_num << "," << rand_max << "," << rand_min << "," << func.first << "," << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << std::endl;
 				}
-
-				print_elapsed_time(func.first.c_str(), t0, clock::now());
 			}
 		}
 	}

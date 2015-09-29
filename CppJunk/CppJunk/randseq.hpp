@@ -1,5 +1,9 @@
 #pragma once
 #
+#include<chrono>
+#include<vector>
+#include<array>
+#include<utility>
 #include <random>
 #include <vector>
 #include <iostream>
@@ -8,6 +12,8 @@
 #include <stdexcept>
 #include <unordered_set>
 #include <functional>
+#include <limits>
+#include <type_traits>
 
 std::mt19937 create_rand_engine(){
 	std::random_device rnd;
@@ -73,3 +79,41 @@ std::vector<int> make_rand_array_shuffle(const size_t size, int rand_min, int ra
 	return std::move(tmp);
 }
 
+std::vector<int> make_rand_array_just_shuffle(const size_t size, int rand_min, int rand_max){
+	if(rand_min > rand_max) std::swap(rand_min, rand_max);
+	const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
+	if(max_min_diff < size) throw std::runtime_error("ˆø”‚ªˆÙí‚Å‚·");
+
+	std::vector<int> tmp;
+	tmp.reserve(max_min_diff);
+
+	for(int i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+
+	auto engine = create_rand_engine();
+	std::shuffle(tmp.begin(), tmp.end(), engine);
+
+	return std::move(tmp);
+}
+
+std::vector<int> make_rand_array_select(const size_t size, int rand_min, int rand_max){
+	if(rand_min > rand_max) std::swap(rand_min, rand_max);
+	const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
+	if(max_min_diff < size) throw std::runtime_error("ˆø”‚ªˆÙí‚Å‚·");
+
+	std::vector<int> tmp;
+	tmp.reserve(max_min_diff);
+
+	for(int i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+
+	auto engine = create_rand_engine();
+	std::uniform_int_distribution<int> distribution(rand_min, rand_max);
+
+	for(size_t cnt = 0; cnt < size; ++cnt){
+		size_t pos =std::uniform_int_distribution<size_t>(cnt, tmp.size()-1)(engine);
+
+		if(cnt != pos) std::swap(tmp[cnt], tmp[pos]);
+	}
+	tmp.erase(std::next(tmp.begin(), size), tmp.end());
+
+	return std::move(tmp);
+}
