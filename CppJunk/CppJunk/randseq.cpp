@@ -22,11 +22,11 @@ int main(){
 
 	FuncArray.push_back(std::make_pair("make_rand_array_hash", make_rand_array_hash));
 	FuncArray.push_back(std::make_pair("make_rand_array_unique", make_rand_array_unique));
-	FuncArray.push_back(std::make_pair("make_rand_array_shuffle", make_rand_array_shuffle));
+//	FuncArray.push_back(std::make_pair("make_rand_array_shuffle", make_rand_array_shuffle));
 
 	try{
-		for(auto val : {1,2,4,8,16}){
-			array_num = 100000;
+		for(auto val : {10,100,1000,10000}){
+			array_num = 10000;
 			rand_max = val*array_num;
 			rand_min = -val*array_num;
 
@@ -34,7 +34,9 @@ int main(){
 			for(auto func : FuncArray){
 				const auto t0 = clock::now();
 
-				func.second(array_num, rand_min, rand_max);
+				for(unsigned int cnt = 0; cnt < 100;++cnt){
+					func.second(array_num, rand_min, rand_max);
+				}
 
 				print_elapsed_time(func.first.c_str(), t0, clock::now());
 			}
