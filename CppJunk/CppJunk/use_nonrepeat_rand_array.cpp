@@ -1,10 +1,10 @@
 #include<chrono>
 #include<vector>
+#include<iostream>
 #include<array>
 #include<utility>
-#include<fstream>
 #include<string>
-#include"randseq.hpp"
+#include"nonrepeat_rand_array.hpp"
 
 template<class T>
 void print_elapsed_time(const char* str, T start, T end){
@@ -22,19 +22,16 @@ int main(){
 
 	std::vector<std::pair<std::string, std::function<void(size_t, int, int)>>> FuncArray;
 
-	FuncArray.push_back(std::make_pair("make_rand_array_just_shuffle", make_rand_array_just_shuffle));
-	FuncArray.push_back(std::make_pair("make_rand_array_shuffle", make_rand_array_shuffle));
-	FuncArray.push_back(std::make_pair("make_rand_array_select", make_rand_array_select));
+	FuncArray.push_back(std::make_pair("make_nonrepeat_rand_array_hash", make_nonrepeat_rand_array_hash<int>));
+	FuncArray.push_back(std::make_pair("make_nonrepeat_rand_array_unique", make_nonrepeat_rand_array_unique<int>));
+	FuncArray.push_back(std::make_pair("make_nonrepeat_rand_array_select", make_nonrepeat_rand_array_select<int>));
 
 	try{
-		std::ofstream fout("randseq3.csv");
-
-		fout << "array_num, rand_max, rand_min, type, time\n";
-		for(size_t array_num_ : {10000}){
-			for(int val : {5000,5001,5002,5004,5008,5016}){
+		for(size_t array_num_ : {100,10000,1000000}){
+			for(int val : {1,10,100,1000,10000,100000}){
 				array_num = array_num_;
-				rand_max = val;
-				rand_min = -val;
+				rand_max = array_num+val;
+				rand_min = 0;
 
 				std::cout << "array_num : " << array_num << "rand_max : " << rand_max << "rand_min : " << rand_min << std::endl;
 				for(auto func : FuncArray){
@@ -47,8 +44,6 @@ int main(){
 					auto t1 = clock::now();
 
 					print_elapsed_time(func.first.c_str(), t0, t1);
-
-					fout << array_num << "," << rand_max << "," << rand_min << "," << func.first << "," << std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << std::endl;
 				}
 			}
 		}
