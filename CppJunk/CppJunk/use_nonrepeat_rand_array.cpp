@@ -28,7 +28,7 @@ int main(){
 	FuncArray.push_back(std::make_pair("unique", make_nonrepeat_rand_array_unique<int>));
 	FuncArray.push_back(std::make_pair("shuffle", make_nonrepeat_rand_array_shuffle<int>));
 	FuncArray.push_back(std::make_pair("select", make_nonrepeat_rand_array_select<int>));
-	FuncArray.push_back(std::make_pair("FisherYates", make_nonrepeat_rand_array_FisherYates<int>));
+	FuncArray.push_back(std::make_pair("select with hash", make_nonrepeat_rand_array_select_with_hash<int>));
 
 	try{
 		for(size_t array_num_ : {100,10000,1000000}){

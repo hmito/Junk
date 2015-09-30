@@ -112,7 +112,7 @@ std::vector<type> make_nonrepeat_rand_array_select(const size_t size, type rand_
 }
 
 template<typename type>
-std::vector<type> make_nonrepeat_rand_array_FisherYates(const size_t size, type rand_min, type rand_max){
+std::vector<type> make_nonrepeat_rand_array_select_with_hash(const size_t size, type rand_min, type rand_max){
 	if(rand_min > rand_max) std::swap(rand_min, rand_max);
 	auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
 	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
