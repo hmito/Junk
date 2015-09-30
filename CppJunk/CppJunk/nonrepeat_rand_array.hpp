@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <unordered_set>
+#include <unordered_map>
 #include <functional>
 #include <limits>
 #include <type_traits>
@@ -50,7 +51,7 @@ std::vector<type> make_nonrepeat_rand_array_unique(const size_t size, type rand_
 
 	//ひとまず、size/5だけ多めに作ってから、重複を消す。
 	//この数字に根拠はないので、より最適な値がある可能性あり
-	const size_t make_size = (std::numeric_limits<size_t>::max() - size / 5) < size)? size: size + size / 5;
+	const size_t make_size = (std::numeric_limits<size_t>::max() - size / 5) < size? size: size + size / 5;
 
 	tmp.reserve(make_size);
 	while(tmp.size() < size){
@@ -69,6 +70,25 @@ std::vector<type> make_nonrepeat_rand_array_unique(const size_t size, type rand_
 }
 
 template<typename type>
+std::vector<type> make_nonrepeat_rand_array_shuffle(const size_t size, type rand_min, type rand_max){
+	if(rand_min > rand_max) std::swap(rand_min, rand_max);
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+	std::vector<int> tmp;
+	tmp.reserve(max_min_diff);
+
+	for(int i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+
+	auto engine = create_rand_engine();
+	std::shuffle(tmp.begin(), tmp.end(), engine);
+
+	tmp.erase(std::next(tmp.begin(), size), tmp.end());
+
+	return std::move(tmp);
+}
+
+template<typename type>
 std::vector<type> make_nonrepeat_rand_array_select(const size_t size, type rand_min, type rand_max) {
 	if (rand_min > rand_max) std::swap(rand_min, rand_max);
 	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
@@ -80,7 +100,6 @@ std::vector<type> make_nonrepeat_rand_array_select(const size_t size, type rand_
 	for (auto i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
 
 	auto engine = create_rand_engine();
-	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
 
 	for (size_t cnt = 0; cnt < size; ++cnt) {
 		size_t pos = std::uniform_int_distribution<size_t>(cnt, tmp.size() - 1)(engine);
@@ -91,6 +110,45 @@ std::vector<type> make_nonrepeat_rand_array_select(const size_t size, type rand_
 
 	return tmp;
 }
+
+template<typename type>
+std::vector<type> make_nonrepeat_rand_array_FisherYates(const size_t size, type rand_min, type rand_max){
+	if(rand_min > rand_max) std::swap(rand_min, rand_max);
+	auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
+	using hash_map = std::unordered_map<type, type>;
+	
+	std::vector<type> tmp;
+	tmp.reserve(size);
+
+	hash_map Map;
+
+	auto engine = create_rand_engine();
+	for(size_t cnt = 0; cnt < size; ++cnt){
+		size_t val = std::uniform_int_distribution<size_t>(rand_min, rand_max)(engine);
+		hash_map::iterator itr = Map.find(val);
+
+		size_t replaced_val;
+		hash_map::iterator replaced_itr = Map.find(rand_max);
+		if(replaced_itr !=Map.end()) replaced_val = replaced_itr->second;
+		else replaced_val = rand_max;
+
+		if(itr == Map.end()){
+			tmp.push_back(val);
+			if(val!=rand_max)Map.insert(std::make_pair(val, replaced_val));
+		} else{
+			tmp.push_back(itr->second);
+			itr->second = replaced_val;
+		}
+
+		//Map.erase(replaced_val);
+		
+		--rand_max;
+	}
+
+	return tmp;
+}
+
 
 template<typename type>
 std::vector<type> make_nonrepeat_rand_array(const size_t size, type rand_min, type rand_max) {
