@@ -18,9 +18,12 @@
     <ClInclude Include="nonrepeat_rand_array.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Finished\nonrepeat_random_integrals\nonrepeat_random_integrals.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="use_nonrepeat_rand_array.cpp">
+    <ClCompile Include="..\..\Finished\nonrepeat_random_integrals\sample_nonrepeat_random_integrals.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

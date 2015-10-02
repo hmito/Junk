@@ -118,10 +118,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Finished\nonrepeat_random_integrals\nonrepeat_random_integrals.hpp" />
     <ClInclude Include="nonrepeat_rand_array.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="use_nonrepeat_rand_array.cpp" />
+    <ClCompile Include="..\..\Finished\nonrepeat_random_integrals\sample_nonrepeat_random_integrals.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
