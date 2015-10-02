@@ -213,3 +213,5 @@ ModelManifest.xml
 
 # other
 *.exe
+*.csv
+*.ods

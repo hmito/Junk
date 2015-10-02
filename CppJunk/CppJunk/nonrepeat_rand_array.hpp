@@ -75,17 +75,17 @@ std::vector<type> make_nonrepeat_rand_array_shuffle(const size_t size, type rand
 	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
 	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
 
-	std::vector<int> tmp;
+	std::vector<type> tmp;
 	tmp.reserve(max_min_diff);
 
-	for(int i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
+	for(auto i = rand_min; i <= rand_max; ++i)tmp.push_back(i);
 
 	auto engine = create_rand_engine();
 	std::shuffle(tmp.begin(), tmp.end(), engine);
 
 	tmp.erase(std::next(tmp.begin(), size), tmp.end());
 
-	return std::move(tmp);
+	return tmp;
 }
 
 template<typename type>
@@ -125,11 +125,11 @@ std::vector<type> make_nonrepeat_rand_array_select_with_hash(const size_t size, 
 
 	auto engine = create_rand_engine();
 	for(size_t cnt = 0; cnt < size; ++cnt){
-		size_t val = std::uniform_int_distribution<size_t>(rand_min, rand_max)(engine);
-		hash_map::iterator itr = Map.find(val);
+		type val = std::uniform_int_distribution<type>(rand_min, rand_max)(engine);
+		auto itr = Map.find(val);
 
 		size_t replaced_val;
-		hash_map::iterator replaced_itr = Map.find(rand_max);
+		auto replaced_itr = Map.find(rand_max);
 		if(replaced_itr !=Map.end()) replaced_val = replaced_itr->second;
 		else replaced_val = rand_max;
 
@@ -149,6 +149,28 @@ std::vector<type> make_nonrepeat_rand_array_select_with_hash(const size_t size, 
 	return tmp;
 }
 
+template<typename type>
+std::vector<type> make_nonrepeat_rand_array_select_with_hash_no_itr(const size_t size, type rand_min, type rand_max) {
+	if (rand_min > rand_max) std::swap(rand_min, rand_max);
+	auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if (max_min_diff < size) throw std::runtime_error("引数が異常です");
+	std::vector<type> re(size);
+	std::unordered_map<type, type> conversion;
+
+	auto engine = create_rand_engine();
+	for (auto& r : re) {
+		type key = std::uniform_int_distribution<type>(0, max_min_diff)(engine);
+		if (!conversion.count(key)) conversion[key] = key;
+		auto& conv_at_key = conversion[key];
+		r = conv_at_key + rand_min;
+		type conv_key = static_cast<type>(max_min_diff - 1);
+		conv_at_key = (conversion.count(conv_key)) ? conversion[conv_key] : conv_key;
+		--max_min_diff;
+	}
+
+	return re;
+}
+
 
 template<typename type>
 std::vector<type> make_nonrepeat_rand_array(const size_t size, type rand_min, type rand_max) {
@@ -156,7 +178,7 @@ std::vector<type> make_nonrepeat_rand_array(const size_t size, type rand_min, ty
 	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
 	if (max_min_diff < size) throw std::runtime_error("Invalid argument");
 	
-	if (size < max_min_diff/33) {
+	if (size < max_min_diff/32) {
 		return make_nonrepeat_rand_array_unique(size, rand_min, rand_max);
 	}
 	else {
