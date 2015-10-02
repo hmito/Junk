@@ -15,17 +15,15 @@ int main(){
 	int rand_max = 1000000;
 	int rand_min = -1000000;
 
-	std::ofstream fout("data_151002_s.csv");
+	std::ofstream fout("data_151002_b.csv");
 
 	std::vector<std::pair<std::string, std::function<void(size_t, int, int)>>> FuncArray;
-//	FuncArray.push_back(std::make_pair("hash", make_nonrepeat_rand_array_hash<int>));
-//	FuncArray.push_back(std::make_pair("unique", make_nonrepeat_rand_array_unique<int>));
+	FuncArray.push_back(std::make_pair("hash", make_nonrepeat_rand_array_hash<int>));
+	FuncArray.push_back(std::make_pair("unique", make_nonrepeat_rand_array_unique<int>));
 //	FuncArray.push_back(std::make_pair("shuffle", make_nonrepeat_rand_array_shuffle<int>));
 //	FuncArray.push_back(std::make_pair("select", make_nonrepeat_rand_array_select<int>));
-//	FuncArray.push_back(std::make_pair("select with hash", make_nonrepeat_rand_array_select_with_hash<int>));
-	FuncArray.push_back(std::make_pair("unique1", make_nonrepeat_rand_array_unique1<int>));
-	FuncArray.push_back(std::make_pair("unique2", make_nonrepeat_rand_array_unique2<int>));
-	FuncArray.push_back(std::make_pair("unique3", make_nonrepeat_rand_array_unique3<int>));
+	FuncArray.push_back(std::make_pair("select with hash", make_nonrepeat_rand_array_select_with_hash<int>));
+
 
 	try{
 		for(auto func : FuncArray){
@@ -49,7 +47,7 @@ int main(){
 					std::cout << " = " << time.count() << "msec" << std::endl;
 					fout << array_num << "," << rand_max << "," << rand_min << "," << func.first << "," << time.count() << std::endl;
 
-//					if(time.count() > 7500)break;
+//					if(time.count() > 9000)break;
 				}
 			}
 		}
