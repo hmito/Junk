@@ -101,10 +101,10 @@ std::vector<type> nonrepeat_random_integrals_by_FisherYatesWithHash(const size_t
 
 	auto engine = create_rand_engine();
 	for(size_t cnt = 0; cnt < size; ++cnt){
-		size_t val = std::uniform_int_distribution<size_t>(rand_min, rand_max)(engine);
+		type val = std::uniform_int_distribution<type>(rand_min, rand_max)(engine);
 		hash_map::iterator itr = Map.find(val);
 
-		size_t replaced_val;
+		type replaced_val;
 		hash_map::iterator replaced_itr = Map.find(rand_max);
 		if(replaced_itr != Map.end()) replaced_val = replaced_itr->second;
 		else replaced_val = rand_max;

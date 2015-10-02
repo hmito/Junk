@@ -49,13 +49,11 @@ std::vector<type> make_nonrepeat_rand_array_unique(const size_t size, type rand_
 	auto engine = create_rand_engine();
 	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
 
-	//ひとまず、size/5だけ多めに作ってから、重複を消す。
-	//この数字に根拠はないので、より最適な値がある可能性あり
-	const size_t make_size = (std::numeric_limits<size_t>::max() - size / 5) < size? size: size + size / 5;
+	const size_t redundancy = static_cast<size_t>(size * (static_cast<double>(size) / max_min_diff + 0.01));
 
-	tmp.reserve(make_size);
+	tmp.reserve(size + redundancy);
 	while(tmp.size() < size){
-		while(tmp.size() < make_size) tmp.push_back(distribution(engine));
+		while(tmp.size() < size + redundancy) tmp.push_back(distribution(engine));
 		std::sort(tmp.begin(), tmp.end());
 		auto unique_end = std::unique(tmp.begin(), tmp.end());
 
@@ -125,10 +123,10 @@ std::vector<type> make_nonrepeat_rand_array_select_with_hash(const size_t size, 
 
 	auto engine = create_rand_engine();
 	for(size_t cnt = 0; cnt < size; ++cnt){
-		size_t val = std::uniform_int_distribution<size_t>(rand_min, rand_max)(engine);
+		type val = std::uniform_int_distribution<type>(rand_min, rand_max)(engine);
 		hash_map::iterator itr = Map.find(val);
 
-		size_t replaced_val;
+		type replaced_val;
 		hash_map::iterator replaced_itr = Map.find(rand_max);
 		if(replaced_itr !=Map.end()) replaced_val = replaced_itr->second;
 		else replaced_val = rand_max;
@@ -162,4 +160,89 @@ std::vector<type> make_nonrepeat_rand_array(const size_t size, type rand_min, ty
 	else {
 		return make_nonrepeat_rand_array_select(size, rand_min, rand_max);
 	}
+}
+
+template<typename type>
+std::vector<type> make_nonrepeat_rand_array_unique1(const size_t size, type rand_min, type rand_max){
+	if(rand_min > rand_max) std::swap(rand_min, rand_max);
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+	std::vector<type> tmp;
+	auto engine = create_rand_engine();
+	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
+
+	const size_t redundancy = static_cast<size_t>(size * 1.1);
+
+	tmp.reserve(size + redundancy);
+	while(tmp.size() < size){
+		while(tmp.size() < size + redundancy) tmp.push_back(distribution(engine));
+		std::sort(tmp.begin(), tmp.end());
+		auto unique_end = std::unique(tmp.begin(), tmp.end());
+
+		if(size < static_cast<size_t>(std::distance(tmp.begin(), unique_end))){
+			unique_end = std::next(tmp.begin(), size);
+		}
+		tmp.erase(unique_end, tmp.end());
+	}
+
+	std::shuffle(tmp.begin(), tmp.end(), engine);
+	return tmp;
+}
+
+template<typename type>
+std::vector<type> make_nonrepeat_rand_array_unique2(const size_t size, type rand_min, type rand_max){
+	if(rand_min > rand_max) std::swap(rand_min, rand_max);
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+	std::vector<type> tmp;
+	auto engine = create_rand_engine();
+	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
+
+	const size_t redundancy = static_cast<size_t>(size * 1.2);
+
+
+	tmp.reserve(size + redundancy);
+	while(tmp.size() < size){
+		while(tmp.size() < size + redundancy) tmp.push_back(distribution(engine));
+		std::sort(tmp.begin(), tmp.end());
+		auto unique_end = std::unique(tmp.begin(), tmp.end());
+
+		if(size < static_cast<size_t>(std::distance(tmp.begin(), unique_end))){
+			unique_end = std::next(tmp.begin(), size);
+		}
+		tmp.erase(unique_end, tmp.end());
+	}
+
+	std::shuffle(tmp.begin(), tmp.end(), engine);
+	return tmp;
+}
+
+template<typename type>
+std::vector<type> make_nonrepeat_rand_array_unique3(const size_t size, type rand_min, type rand_max){
+	if(rand_min > rand_max) std::swap(rand_min, rand_max);
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+	std::vector<type> tmp;
+	auto engine = create_rand_engine();
+	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
+
+	const size_t redundancy = static_cast<size_t>(size * 1.3);
+
+	tmp.reserve(size + redundancy);
+	while(tmp.size() < size){
+		while(tmp.size() < size + redundancy) tmp.push_back(distribution(engine));
+		std::sort(tmp.begin(), tmp.end());
+		auto unique_end = std::unique(tmp.begin(), tmp.end());
+
+		if(size < static_cast<size_t>(std::distance(tmp.begin(), unique_end))){
+			unique_end = std::next(tmp.begin(), size);
+		}
+		tmp.erase(unique_end, tmp.end());
+	}
+
+	std::shuffle(tmp.begin(), tmp.end(), engine);
+	return tmp;
 }
