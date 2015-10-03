@@ -49,9 +49,7 @@ std::vector<type> make_nonrepeat_rand_array_unique(const size_t size, type rand_
 	auto engine = create_rand_engine();
 	std::uniform_int_distribution<type> distribution(rand_min, rand_max);
 
-	//ひとまず、size/5だけ多めに作ってから、重複を消す。
-	//この数字に根拠はないので、より最適な値がある可能性あり
-	const size_t make_size = (std::numeric_limits<size_t>::max() - size / 5) < size? size: size + size / 5;
+	const size_t make_size = size < std::numeric_limits<type>::max() - size / 5 ? size + size / 5 : std::numeric_limits<type>::max();
 
 	tmp.reserve(make_size);
 	while(tmp.size() < size){
@@ -128,7 +126,7 @@ std::vector<type> make_nonrepeat_rand_array_select_with_hash(const size_t size, 
 		type val = std::uniform_int_distribution<type>(rand_min, rand_max)(engine);
 		auto itr = Map.find(val);
 
-		size_t replaced_val;
+		type replaced_val;
 		auto replaced_itr = Map.find(rand_max);
 		if(replaced_itr !=Map.end()) replaced_val = replaced_itr->second;
 		else replaced_val = rand_max;

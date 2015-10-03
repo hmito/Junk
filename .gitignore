@@ -213,5 +213,6 @@ ModelManifest.xml
 
 # other
 *.exe
+.Rproj.user
 *.csv
 *.ods
