@@ -1,4 +1,4 @@
-#include<chrono>
+﻿#include<chrono>
 #include<vector>
 #include<iostream>
 #include<fstream>
@@ -6,14 +6,12 @@
 #include<array>
 #include<utility>
 #include<string>
+#include <cstdint>
 #include"nonrepeat_rand_array.hpp"
 
 using make_rand_array_type = std::vector<int>(*)(size_t, int, int);
 int main(){
-	using clock = std::chrono::high_resolution_clock;
-	size_t array_num = 10000;
-	int rand_max = 1000000;
-	int rand_min = -1000000;
+	using namespace std::chrono;
 
 	std::ofstream fout("data_151002_b.csv");
 
@@ -27,27 +25,29 @@ int main(){
 
 	try{
 		for(auto func : FuncArray){
-			for(size_t array_num_ : {100,10000,1000000}){
+			for(size_t array_num : {100,10000,1000000}){
 				for(int val = 0; val < 30; ++val){
-					array_num = array_num_;
-					rand_max = static_cast<int>(array_num_ * std::pow(10.0, val/10.));
-					rand_min = 0;
+					const auto rand_max = static_cast<int>(array_num * std::pow(10.0, val/10.0));
+					decltype(rand_max) rand_min = 0;
+					try{
+						std::cout << "array_num : " << array_num << " rand_max : " << rand_max << " rand_min : " << rand_min << " type : "<<func.first;
+						const auto t0 = high_resolution_clock::now();
 
-					std::cout << "array_num : " << array_num << " rand_max : " << rand_max << " rand_min : " << rand_min << " type : "<<func.first;
-					const auto t0 = clock::now();
+							for (unsigned int cnt = 0; cnt < 10000000 / array_num; ++cnt) {
+							func.second(array_num, rand_min, rand_max);
+						}
 
-					for(unsigned int cnt = 0; cnt < 10000000 / array_num; ++cnt){
-						func.second(array_num, rand_min, rand_max);
+						const auto t1 = high_resolution_clock::now();
+						const auto time = duration_cast<milliseconds>(t1 - t0);
+
+						std::cout << " = " << time.count() << "msec" << std::endl;
+						fout << array_num << "," << rand_max << "," << rand_min << "," << func.first << "," << time.count() << std::endl;
+						//if(time.count() > 7500)break;
 					}
-
-					auto t1 = clock::now();
-
-					auto time = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
-
-					std::cout << " = " << time.count() << "msec" << std::endl;
-					fout << array_num << "," << rand_max << "," << rand_min << "," << func.first << "," << time.count() << std::endl;
-
-//					if(time.count() > 9000)break;
+					catch (const std::exception& er) {
+						std::cerr << er.what() << std::endl;
+						//fout << array_num << "," << rand_max << "," << rand_min << "," << func.first << "," << er.what() << std::endl;
+					}
 				}
 			}
 		}
@@ -56,9 +56,9 @@ int main(){
 		std::cerr << er.what() << std::endl;
 	}
 
-
-	system("pause");
-
+#ifdef _MSC_VER
+	system("pause");//mingw gcc環境では必要ない
+#endif
 	return 0;
 }
 
