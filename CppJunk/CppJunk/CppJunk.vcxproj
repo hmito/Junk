@@ -18,6 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\csv_iterator\csv_iterator.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\csv_iterator\use_csv_iterator_2.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9AB8A48F-E851-48B3-BE6E-E7BE44CC7930}</ProjectGuid>
     <RootNamespace>CppJunk</RootNamespace>
@@ -117,13 +123,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Finished\nonrepeat_random_integrals\nonrepeat_random_integrals.hpp" />
-    <ClInclude Include="nonrepeat_rand_array.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="use_nonrepeat_rand_array.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
