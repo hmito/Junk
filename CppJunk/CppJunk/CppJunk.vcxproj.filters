@@ -20,7 +20,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\csv_iterator\use_csv_iterator_2.cpp">
+    <ClCompile Include="..\..\csv_iterator\use_csv_iterator_3.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

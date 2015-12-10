@@ -22,7 +22,7 @@
     <ClInclude Include="..\..\csv_iterator\csv_iterator.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\csv_iterator\use_csv_iterator_2.cpp" />
+    <ClCompile Include="..\..\csv_iterator\use_csv_iterator_3.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9AB8A48F-E851-48B3-BE6E-E7BE44CC7930}</ProjectGuid>

@@ -5,13 +5,11 @@
 #include "csv_iterator.hpp"
 
 int main(){
-	auto oitr = csv::current(std::cout, csv::mode::tsv);
-
 	std::vector<std::string> Names;
 	std::vector<bool> IsFemales;
 	std::vector<int> Ages;
 
-	std::ifstream fin("data.csv");
+	std::ifstream fin("data1.csv");
 	auto itr = csv::begin(fin, csv::mode::csv);
 
 	//1çsì«Ç›îÚÇŒÇ∑
