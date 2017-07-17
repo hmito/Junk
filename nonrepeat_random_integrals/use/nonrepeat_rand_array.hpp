@@ -169,39 +169,40 @@ std::vector<type> make_nonrepeat_rand_array_select_with_hash_no_itr(const size_t
 	return re;
 }
 
-int* fn3_2_3_make_rand_array_select(const size_t size, int rand_min, int rand_max) {
-	if (rand_min > rand_max) std::swap(rand_min, rand_max);
-	const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
-	if (max_min_diff < size) throw std::runtime_error("引数が異常です");
+int* fn3_2_make_rand_array_select(const size_t size, int rand_min, int rand_max) {
+    if (rand_min > rand_max) std::swap(rand_min, rand_max);
+    const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
+    if (max_min_diff < size) throw std::runtime_error("引数が異常です");
 
-	int* tmp = (int*)malloc(sizeof(int) * max_min_diff);
-	int* srcPtr = tmp;
-	for (int i = rand_min; i <= rand_max; i++, srcPtr++)
-	{
-		*srcPtr = i;
-	}
+    int* tmp = (int*)malloc(sizeof(int) * max_min_diff);
+    int* srcPtr = tmp;
+    for (int i = rand_min; i <= rand_max; i++, srcPtr++)
+    {
+        *srcPtr = i;
+    }
 
-	auto engine = create_rand_engine();
-	int distMax = max_min_diff - 1;
-	std::uniform_int_distribution<int> distribution(0, distMax); // 全数撹拌
+    auto engine = create_rand_engine();
+    int distMax = max_min_diff - 1;
+    //std::uniform_int_distribution<int> distribution(0, distMax); // こちらの方が適切(毎回、全数撹拌)
 
-	// 撹拌用ループ
-	//int* dstPtr;
-	for (size_t i = 0; i < size; i++) {
-		// sizeが0の場合は、0 > (max_min_diff - 1)の可能性がある (次行あたりでruntime_errorになるはず)
-		//std::uniform_int_distribution<int> distribution(cnt, distMax); // 部分撹拌
-		size_t pos = distribution(engine);
-		size_t cnt = distribution(engine);
-		if (cnt != pos) {
-			int old = tmp[cnt];
-			tmp[cnt] = tmp[pos];
-			tmp[pos] = old;
-		}
-	}
+    // 先頭から戻り値を格納するループ
+    int* dstPtr = tmp;
+    for (size_t cnt = 0; cnt < size; cnt++, dstPtr++) {
+        // sizeが0の場合は、0 > (max_min_diff - 1)の可能性がある (次行あたりでruntime_errorになるはず)
+        std::uniform_int_distribution<int> distribution(cnt, distMax); // 元のロジック(未撹拌部分のみ操作)
+        size_t pos = distribution(engine);
+        if (cnt != pos) {
+            // 上書きする前に退避
+            int old = *dstPtr; // tmp[cnt]
+            *dstPtr = tmp[pos]; // 戻り値を入れる
+            tmp[pos] = old; // 使った値と使っていない値を入替る
+        }
+        // cntとposが同じ場合は、元の値のまま残す
+    }
 
-	// 先頭から長さsizeのデータを戻り値として使う
-	// 使用後は、呼び出し側でfree(tmp)を呼ぶこと
-	return tmp;
+    // 先頭から長さsizeのデータを戻り値として使う
+    // 使用後は、呼び出し側でfree(tmp)を呼ぶこと
+    return tmp;
 }
 
 template<typename type>
