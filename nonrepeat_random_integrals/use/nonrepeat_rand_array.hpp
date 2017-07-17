@@ -113,7 +113,7 @@ template<typename type>
 std::vector<type> make_nonrepeat_rand_array_select_with_hash(const size_t size, type rand_min, type rand_max){
 	if(rand_min > rand_max) std::swap(rand_min, rand_max);
 	auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
+//	if(max_min_diff < size) throw std::runtime_error("Invalid argument");
 	using hash_map = std::unordered_map<type, type>;
 	
 	std::vector<type> tmp;
@@ -169,12 +169,69 @@ std::vector<type> make_nonrepeat_rand_array_select_with_hash_no_itr(const size_t
 	return re;
 }
 
+int* fn3_2_3_make_rand_array_select(const size_t size, int rand_min, int rand_max) {
+	if (rand_min > rand_max) std::swap(rand_min, rand_max);
+	const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
+	if (max_min_diff < size) throw std::runtime_error("引数が異常です");
+
+	int* tmp = (int*)malloc(sizeof(int) * max_min_diff);
+	int* srcPtr = tmp;
+	for (int i = rand_min; i <= rand_max; i++, srcPtr++)
+	{
+		*srcPtr = i;
+	}
+
+	auto engine = create_rand_engine();
+	int distMax = max_min_diff - 1;
+	std::uniform_int_distribution<int> distribution(0, distMax); // 全数撹拌
+
+	// 撹拌用ループ
+	//int* dstPtr;
+	for (size_t i = 0; i < size; i++) {
+		// sizeが0の場合は、0 > (max_min_diff - 1)の可能性がある (次行あたりでruntime_errorになるはず)
+		//std::uniform_int_distribution<int> distribution(cnt, distMax); // 部分撹拌
+		size_t pos = distribution(engine);
+		size_t cnt = distribution(engine);
+		if (cnt != pos) {
+			int old = tmp[cnt];
+			tmp[cnt] = tmp[pos];
+			tmp[pos] = old;
+		}
+	}
+
+	// 先頭から長さsizeのデータを戻り値として使う
+	// 使用後は、呼び出し側でfree(tmp)を呼ぶこと
+	return tmp;
+}
+
+template<typename type>
+std::vector<type> make_nonrepeat_rand_array_select2(const size_t size, type rand_min, type rand_max) {
+	if (rand_min > rand_max) std::swap(rand_min, rand_max);
+	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
+	if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+
+	std::vector<type> tmp(max_min_diff);
+	int i = 0;
+	for (auto itr = std::begin(tmp); itr != std::end(tmp); ++itr) *itr = i++;
+
+	auto engine = create_rand_engine();
+
+	for (size_t cnt = 0; cnt < size; ++cnt) {
+		size_t pos = std::uniform_int_distribution<size_t>(cnt, tmp.size() - 1)(engine);
+
+		if (cnt != pos) std::swap(tmp[cnt], tmp[pos]);
+	}
+	tmp.erase(std::next(tmp.begin(), size), tmp.end());
+
+	return tmp;
+
+}
 
 template<typename type>
 std::vector<type> make_nonrepeat_rand_array(const size_t size, type rand_min, type rand_max) {
 	if (rand_min > rand_max) std::swap(rand_min, rand_max);
 	const auto max_min_diff = detail::diff(rand_max, rand_min) + 1;
-	if (max_min_diff < size) throw std::runtime_error("Invalid argument");
+//	if (max_min_diff < size) throw std::runtime_error("Invalid argument");
 	
 	if (size < max_min_diff/32) {
 		return make_nonrepeat_rand_array_unique(size, rand_min, rand_max);
