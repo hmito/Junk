@@ -14,16 +14,18 @@
 int main() {
 	using namespace std::chrono;
 
-	constexpr unsigned int array_num = 100000;
+	constexpr unsigned int size = 100000;
 	int rand_min = 0;
-	int rand_max = 1000000;
+	int rand_max = 10000000s;
+
+	std::cout << "size : " << size << ", rand_max : " << rand_max << ", rand_min : " << rand_min << ", and_max / size : " << (rand_max- rand_min)/size<<std::endl;
 
 	{
 		std::vector<int> Ans;
-		std::cout << "array_num : " << array_num << " rand_max : " << rand_max << " rand_min : " << rand_min << " type : " << "select";
+		std::cout << "select";
 		const auto t0 = high_resolution_clock::now();
 
-		Ans = make_nonrepeat_rand_array_select(array_num, rand_min, rand_max);
+		Ans = make_nonrepeat_rand_array_select(size, rand_min, rand_max);
 
 		const auto t1 = high_resolution_clock::now();
 		const auto time = duration_cast<milliseconds>(t1 - t0);
@@ -33,10 +35,10 @@ int main() {
 
 	{
 		std::vector<int> Ans;
-		std::cout << "array_num : " << array_num << " rand_max : " << rand_max << " rand_min : " << rand_min << " type : " << "select2";
+		std::cout << "select2";
 		const auto t0 = high_resolution_clock::now();
 
-		Ans = make_nonrepeat_rand_array_select2(array_num, rand_min, rand_max);
+		Ans = make_nonrepeat_rand_array_select2(size, rand_min, rand_max);
 
 		const auto t1 = high_resolution_clock::now();
 		const auto time = duration_cast<milliseconds>(t1 - t0);
@@ -46,10 +48,10 @@ int main() {
 	{
 		int* Ans;
 
-		std::cout << "array_num : " << array_num << " rand_max : " << rand_max << " rand_min : " << rand_min << " type : " << "fn3_2_3_select";
+		std::cout << "fn3_2_3_select";
 		const auto t0 = high_resolution_clock::now();
 		
-		Ans = fn3_2_3_make_rand_array_select(array_num, rand_min, rand_max);
+		Ans = fn3_2_3_make_rand_array_select(size, rand_min, rand_max);
 
 		const auto t1 = high_resolution_clock::now();
 		const auto time = duration_cast<milliseconds>(t1 - t0);
