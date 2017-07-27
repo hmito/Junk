@@ -30,7 +30,7 @@
     <ClInclude Include="..\..\nonrepeat_random_integrals\use\nonrepeat_rand_array.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\nonrepeat_random_integrals\use\compare_with_raw_array.cpp" />
+    <ClCompile Include="async.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9AB8A48F-E851-48B3-BE6E-E7BE44CC7930}</ProjectGuid>
@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>LLVM-vs2014</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
