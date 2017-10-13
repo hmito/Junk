@@ -25,4 +25,14 @@ public class CardVector{
         return Cards[Size-1];
     }
     public int size(){return Size;}
+    public int capacity(){return Cards.length;}
+    public Card at(int Pos){return Cards[Pos];}
+    public String str(){
+        if(empty())return "";
+        String Str=Cards[0].str();
+        for(int i=1;i<Size;++i){
+            Str+=", "+Cards[i].str();
+        }
+        return Str;
+    }
 } 

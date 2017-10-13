@@ -4,16 +4,35 @@ public class Main{
 
         CardVector Vec = new CardVector();
         Vec.push_back(new Card(1,1));
-        Vec.push_back(new Card(2,1));
-        Vec.push_back(new Card(3,1));
-        Vec.push_back(new Card(4,1));
-        Vec.push_back(new Card(1,2));
-
-        while(!Vec.empty()){
-            System.out.println(Vec.size());
-            System.out.println(Vec.back().str());
-            Vec.pop_back();            
-        }
+        System.out.println(Vec.str());
         System.out.println(Vec.size());
+        System.out.println(Vec.capacity());
+        
+        Vec.push_back(new Card(2,1));
+        System.out.println(Vec.str());
+        System.out.println(Vec.size());
+        System.out.println(Vec.capacity());
+
+        Vec.push_back(new Card(3,1));
+        System.out.println(Vec.str());
+        System.out.println(Vec.size());
+        System.out.println(Vec.capacity());
+
+        Vec.push_back(new Card(4,1));
+        System.out.println(Vec.str());
+        System.out.println(Vec.size());
+        System.out.println(Vec.capacity());
+
+        Vec.push_back(new Card(1,2));
+        System.out.println(Vec.str());
+        System.out.println(Vec.size());
+        System.out.println(Vec.capacity());
+        
+        while(!Vec.empty()){
+            Vec.pop_back();            
+            System.out.println(Vec.str());
+            System.out.println(Vec.size());
+            System.out.println(Vec.capacity());
+        }
     }
 }
