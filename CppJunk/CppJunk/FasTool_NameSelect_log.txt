@@ -1,0 +1,20 @@
+FasTool NameSelect v1.1
+
+initial status
+	argc	1
+	D:\Projects\Junk\CppJunk\x64\Debug\CppJunk.exe
+
+fail to get input file name
+	FileNum	1
+	shirouzu_97.fasta
+
+# file open mode
+open "shirouzu_97.fasta"...ok
+read fasta...ok
+	DataNum	1679
+	AllDataNum	1679
+# end file open mode
+
+DataNum	1679
+NameNum	0
+*** Error *** : input no name

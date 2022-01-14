@@ -15,12 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\nonrepeat_random_integrals\use\nonrepeat_rand_array.hpp">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="async.cpp">
+    <ClCompile Include="sp_count.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
