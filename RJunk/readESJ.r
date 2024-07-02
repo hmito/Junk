@@ -75,8 +75,11 @@ for(slot.i in 1:length(html.ul)){
 		))
 	}	
 }
-
-
+talk.table = talk.table |>
+	mutate(session.id = session |> stringr::str_extract("^[a-zA-Z][0-9]+")) |> 
+	mutate(session.jp = session |> stringr::str_remove(sprintf("^%s\\s*",session.id))|>stringr::str_remove("\\s*/.*$")) |>
+	mutate(session.en = session |> stringr::str_remove(sprintf("^%s\\s*",session.id))|>stringr::str_remove("^.*/\\s*"))
+	
 for(date.f in unique(talk.table$date)){
 	data = talk.table |> filter(date==date.f)
 	rooms = unique(data$room)
@@ -110,9 +113,14 @@ for(date.f in unique(talk.table$date)){
 			if(nrow(datum)){
 				if(nrow(datum)>1)warning(sprintf("%s %s %s %d",date.f,time.f,room.f,nrow(datum)))
 				cellnum = which(times == datum$time.end) - which(times == datum$time.beg)
+				correspo = datum$author |> 
+					stringr::str_split(",\\s*") |> 
+					purrr::map(\(x){x[stringr::str_detect(x,"\\*")]})|>
+					stringr::str_remove_all("（.+）")
 
-				fout("<td rowspan=%d> <a href=%s>%s</a><br/>%s</td>",
-					  cellnum,htmlat(datum$url),datum$title,datum$author|>stringr::str_remove_all("（.+）"))
+				fout('<td rowspan=%d valign="top"> %s <b>%s</b> <br/><a href=%s>%s</a><br/>%s</td>',
+					  cellnum, datum$id,datum$session.jp,
+					  htmlat(datum$url),datum$title,correspo)
 
 			}else if(time.f==head(times,1) || nrow(prevd)){
 				nextd = data |> filter(time.beg>time.f & room==room.f) |> head(1)
