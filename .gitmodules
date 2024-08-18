@@ -1,0 +1,3 @@
+[submodule "RJunk/src/hmLib"]
+	path = RJunk/src/hmLib
+	url = https://github.com/hmito/hmLib
