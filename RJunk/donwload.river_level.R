@@ -63,29 +63,27 @@ download.river_level = function(id,from_year,from_month,to_year=NULL,to_month=NU
 }
 
 
-ids = c("306041286606060","306041286606040","306041286606010","306041286606160") #淀、向島, 宇治, 勸修寺
+ids = c("302041282207170","302041282207170") #淀、向島, 宇治, 勸修寺
 data_list = NULL
 for(id in ids){
-	basedata = download.river_level(id,2023,6)
+	basedata = download.river_level(id,2025,3)
 	data_list = c(data_list,list(basedata))
 }
 #水位を表示
 ggplot() +
-	geom_line(data=data_list[[1]],aes(x=datetime,y=level-min(level,na.rm = TRUE)),color="red")+
-	geom_line(data=data_list[[2]],aes(x=datetime,y=level-min(level,na.rm = TRUE)),color="green")+
-	geom_line(data=data_list[[3]],aes(x=datetime,y=level-min(level,na.rm = TRUE)),color="blue")+
-	geom_line(data=data_list[[4]],aes(x=datetime,y=level-min(level,na.rm = TRUE)),color="gold")+
-	xlim(as_datetime("2023-06-01 00:00:00"), as_datetime("2023-06-03 00:00:00")) + 
+	geom_line(data=data_list[[1]],aes(x=datetime,y=level),color="red")+
+#	geom_line(data=data_list[[2]],aes(x=datetime,y=level-min(level,na.rm = TRUE)),color="green")+
+#	geom_line(data=data_list[[3]],aes(x=datetime,y=level-min(level,na.rm = TRUE)),color="blue")+
+#	geom_line(data=data_list[[4]],aes(x=datetime,y=level-min(level,na.rm = TRUE)),color="gold")+
+	xlim(as_datetime("2025-03-01 00:00:00"), as_datetime("2025-03-30 00:00:00")) + 
 	NULL
-
-
 
 
 #雁来の雪解けが落ち着くのはいつ？
 #id = "301031281101520"
-id = "301031281101170"
+id = "302031282207010"
 #10年間のベースデータ入手
-basedata = download.river_level(id,2013,1,2022,12)
+basedata = download.river_level(id,2024,4,2025,3)
 base = basedata %>%
 	mutate(day = strftime(datetime,"%j")%>%as.integer()) %>%
 	group_by(day) %>% summarise(
@@ -96,20 +94,27 @@ base = basedata %>%
 		max = max(level,na.rm=TRUE),
 		.groups = "drop"
 	) %>%
-	mutate(datetime = as_datetime("2023-01-01 0:00:00 JST") + ddays(day-1))
-#今年のデータを入手
-data = download.river_level(id,2023,1,2023,5)
-
+	mutate(datetime = as_datetime("2024-04-01 0:00:00 JST") + ddays(day-1))
 
 #水位を表示
 ggplot() +
 	geom_ribbon(data=base,aes(x=datetime,ymin=min,ymax=max),alpha=0.1) +
 	geom_ribbon(data=base,aes(x=datetime,ymin=q25,ymax=q75),alpha=0.25) +
 	geom_line(data=base,aes(x=datetime,y=med),alpha=0.5) +
-	geom_line(data=data,aes(x=datetime,y=level),color="red")+
-	#xlim(as_datetime("2023-01-01 00:00:00"), as_datetime("2023-07-01 00:00:00")) + 
+#	geom_line(data=data,aes(x=datetime,y=level),color="red")+
+	xlim(as_datetime("2024-10-01 00:00:00"), as_datetime("2024-10-30 00:00:00")) + 
 	NULL
 
+
+
+#10年間のベースデータ入手
+basedata = download.river_level(id,2011,3,2011,4)
+#水位を表示
+ggplot() +
+	geom_line(data=basedata,aes(x=datetime,y=level)) +
+	#	geom_line(data=data,aes(x=datetime,y=level),color="red")+
+	xlim(as_datetime("2011-3-11 00:00:00"), as_datetime("2011-3-13 00:00:00")) + 
+	NULL
 
 
 
